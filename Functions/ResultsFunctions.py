@@ -143,10 +143,16 @@ def PODSave(Geometry, Array, TensorArray, EigenValues, N0, PODTensors, PODEigenV
 
 
     #Format the tensor arrays so they can be plotted
-    PlottingTensorArray = np.zeros([Points,6],dtype=complex)
-    PlottingPODTensors = np.zeros([PODPoints,6],dtype=complex)
-    PlottingTensorArray = np.concatenate([np.concatenate([TensorArray[:,:3],TensorArray[:,4:6]],axis=1),TensorArray[:,8:9]],axis=1)
-    PlottingPODTensors = np.concatenate([np.concatenate([PODTensors[:,:3],PODTensors[:,4:6]],axis=1),PODTensors[:,8:9]],axis=1)
+#    PlottingTensorArray = np.zeros([Points,6],dtype=complex)
+#    PlottingPODTensors = np.zeros([PODPoints,6],dtype=complex)
+#    PlottingTensorArray = np.concatenate([np.concatenate([TensorArray[:,:3],TensorArray[:,4:6]],axis=1),TensorArray[:,8:9]],axis=1)
+#    PlottingPODTensors = np.concatenate([np.concatenate([PODTensors[:,:3],PODTensors[:,4:6]],axis=1),PODTensors[:,8:9]],axis=1)
+
+    PlottingTensorArray = np.zeros([Points,27],dtype=complex)
+    PlottingPODTensors = np.zeros([PODPoints,27],dtype=complex)
+    PlottingTensorArray = TensorArray #np.concatenate([np.concatenate([TensorArray[:,:3],TensorArray[:,4:6]],axis=1),TensorArray[:,8:9]],axis=1)
+    PlottingPODTensors = PODTensors
+
     try:
         ErrorTensors[:,[1,3]] = ErrorTensors[:,[3,1]]
         ErrorTensors[:,[2,4]] = ErrorTensors[:,[4,2]]

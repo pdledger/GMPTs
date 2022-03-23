@@ -428,6 +428,169 @@ def Theta1_SweepR3(Array,mesh,fes,fes2,Theta0Sols,xivec,alpha,sigma,mu,inout,Tol
         return Theta1Sols
 
 
+def Theta1_Lower_SweepR3(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Truncated,Theta0Sols,xivec,alpha,sigma,mu,inout,N0,TotalNOF,counter,PODErrorBars,alphaLB,G_Store):
+
+    #Setup variables
+    Mu0 = 4*np.pi*10**(-7)
+    nu_no_omega = Mu0*(alpha**2)
+    evec = [ CoefficientFunction( (1,0,0) ), CoefficientFunction( (0,1,0) ), CoefficientFunction( (0,0,1) ) ]
+    xyz =  CoefficientFunction( (x,y,z) )
+    NOF = len(Array)
+    cutoff = len(Sols[:,0,0])
+    Theta_0i=GridFunction(fes)
+    Theta_0j=GridFunction(fes)
+    Theta_0k=GridFunction(fes)
+
+    Theta_1i=GridFunction(fes2)
+    Theta_1j=GridFunction(fes2)
+    Theta_1k=GridFunction(fes2)
+
+    TensorArray = np.zeros([NOF,27],dtype=complex)
+    EigenValues = np.zeros([NOF,3],dtype=complex)
+
+    if PODErrorBars == True:
+        rom1 = np.zeros([1+2*cutoff,1],dtype=complex)
+        rom2 = np.zeros([1+2*cutoff,1],dtype=complex)
+        rom3 = np.zeros([1+2*cutoff,1],dtype=complex)
+        TensorErrors=np.zeros([NOF,3])
+        ErrorTensors=np.zeros([NOF,6])
+        G1 = G_Store[:,:,0]
+        G2 = G_Store[:,:,1]
+        G3 = G_Store[:,:,2]
+        G12 = G_Store[:,:,3]
+        G13 = G_Store[:,:,4]
+        G23 = G_Store[:,:,5]
+
+    for k,omega in enumerate(Array):
+
+        #This part is for obtaining the solutions in the lower dimensional space
+        counter.value+=1
+        print(' solving reduced order system %d/%d    ' % (counter.value,TotalNOF), end='\r')
+
+        #This part projects the problem to the higher dimensional space
+        W1=np.dot(u1Truncated,Sols[:,k,0]).flatten()
+        W2=np.dot(u2Truncated,Sols[:,k,1]).flatten()
+        W3=np.dot(u3Truncated,Sols[:,k,2]).flatten()
+
+        #Calculate the tensors
+        nu = omega*Mu0*(alpha**2)
+        R=np.zeros([3,3])
+        I=np.zeros([3,3])
+
+#        for i in range(3):
+#            Theta_0i.vec.FV().NumPy()[:] = Theta0Sols[:,i]
+#            xii = xivec[i]
+#            if i==0:
+#                Theta_1i.vec.FV().NumPy()[:]=W1
+#            if i==1:
+#                Theta_1i.vec.FV().NumPy()[:]=W2
+#            if i==2:
+#                Theta_1i.vec.FV().NumPy()[:]=W3
+#            for j in range(i+1):
+#                Theta_0j.vec.FV().NumPy()[:]=Theta0Sols[:,j]
+#                xij=xivec[j]
+#                if j==0:
+#                    Theta_1j.vec.FV().NumPy()[:]=W1
+#                if j==1:
+#                    Theta_1j.vec.FV().NumPy()[:]=W2
+#                if j==2:
+#                    Theta_1j.vec.FV().NumPy()[:]=W3
+
+                #Real and Imaginary parts
+#                R[i,j]=-(((alpha**3)/4)*Integrate((mu**(-1))*(curl(Theta_1j)*Conj(curl(Theta_1i))),mesh)).real
+#                I[i,j]=((alpha**3)/4)*Integrate(inout*nu*sigma*((Theta_1j+Theta_0j+xij)*(Conj(Theta_1i)+Theta_0i+xii)),mesh).real
+
+#        R+=np.transpose(R-np.diag(np.diag(R))).real
+#        I+=np.transpose(I-np.diag(np.diag(I))).real
+
+        NR3=np.zeros([3,3,3], dtype=complex)
+        CR3=np.zeros([3,3,3], dtype=complex)
+        vol=alpha**3*Integrate(inout,mesh)
+        print(vol)
+        for i in range(3):
+            for j in range(3):
+                for kk in range(3):
+                    Theta_0k.vec.FV().NumPy()[:] = Theta0Sols[:,kk]
+                    xii=xivec[i]
+                    xik=xivec[kk]
+                    ej=evec[j]
+                    if kk==0:
+                        #Theta1k.vec.FV().NumPy()[:]=Theta1E1Sol
+                        Theta_1k.vec.FV().NumPy()[:]=W1
+                        #Theta1k.vec.data=Theta1.vec.data
+                    if kk==1:
+                        #Theta1k.vec.FV().NumPy()[:]=Theta1E2Sol
+                        #Theta1k.vec.data=Theta2.vec.data
+                        Theta_1k.vec.FV().NumPy()[:]=W2
+                    if kk==2:
+                        #Theta1k.vec.FV().NumPy()[:]=Theta1E3Sol
+                        #Theta1k.vec.data=Theta3.vec.data
+                        Theta_1k.vec.FV().NumPy()[:]=W3
+
+                    #CR3[i,j,k] = 1j*(alpha**3)/4*Integrate(nu*sigma*inout*((Theta1k+Theta0k+xik)*xii),mesh)
+                    CR3[i,j,kk] = 1j*(alpha**4)/8*Integrate(nu_no_omega*omega*sigma*inout*(xyz*ej)*((Theta_1k+Theta_0k+xik)*xii),mesh)
+                    NR3[i,j,kk]=-alpha**4*Integrate((1-mu**(-1))*InnerProduct(xyz,ej)*InnerProduct(evec[i],1/2*curl(Theta_0k)+1/2*curl(Theta_1k)+evec[kk])*inout,mesh)
+
+
+            #Save in arrays
+        print(CR3)
+        TensorArray[k,:] = (CR3).flatten()
+
+        #Save in arrays
+        #TensorArray[k,:] = (N0+R+1j*I).flatten()
+        EigenValues[k,:] = np.sort(np.linalg.eigvals(N0+R))+1j*np.sort(np.linalg.eigvals(I))
+
+
+        if PODErrorBars==True:
+            rom1[0,0] = omega
+            rom2[0,0] = omega
+            rom3[0,0] = omega
+
+            rom1[1:1+cutoff,0] = -Sols[:,k,0].flatten()
+            rom2[1:1+cutoff,0] = -Sols[:,k,1].flatten()
+            rom3[1:1+cutoff,0] = -Sols[:,k,2].flatten()
+
+            rom1[1+cutoff:,0] = -(Sols[:,k,0]*omega).flatten()
+            rom2[1+cutoff:,0] = -(Sols[:,k,1]*omega).flatten()
+            rom3[1+cutoff:,0] = -(Sols[:,k,2]*omega).flatten()
+
+            error1 = np.conjugate(np.transpose(rom1))@G1@rom1
+            error2 = np.conjugate(np.transpose(rom2))@G2@rom2
+            error3 = np.conjugate(np.transpose(rom3))@G3@rom3
+            error12 = np.conjugate(np.transpose(rom1))@G12@rom2
+            error13 = np.conjugate(np.transpose(rom1))@G13@rom3
+            error23 = np.conjugate(np.transpose(rom2))@G23@rom3
+
+            error1 = abs(error1)**(1/2)
+            error2 = abs(error2)**(1/2)
+            error3 = abs(error3)**(1/2)
+            error12 = error12.real
+            error13 = error13.real
+            error23 = error23.real
+
+            Errors=[error1,error2,error3,error12,error13,error23]
+
+            for j in range(6):
+                if j<3:
+                    ErrorTensors[k,j] = ((alpha**3)/4)*(Errors[j]**2)/alphaLB
+                else:
+                    ErrorTensors[k,j] = -2*Errors[j]
+                    if j==3:
+                        ErrorTensors[k,j] += (Errors[0]**2)+(Errors[1]**2)
+                        ErrorTensors[k,j] = ((alpha**3)/(8*alphaLB))*((Errors[0]**2)+(Errors[1]**2)+ErrorTensors[k,j])
+                    if j==4:
+                        ErrorTensors[k,j] += (Errors[0]**2)+(Errors[2]**2)
+                        ErrorTensors[k,j] = ((alpha**3)/(8*alphaLB))*((Errors[0]**2)+(Errors[1]**2)+ErrorTensors[k,j])
+                    if j==5:
+                        ErrorTensors[k,j] += (Errors[1]**2)+(Errors[2]**2)
+                        ErrorTensors[k,j] = ((alpha**3)/(8*alphaLB))*((Errors[0]**2)+(Errors[1]**2)+ErrorTensors[k,j])
+
+
+    if PODErrorBars == True:
+        return TensorArray, EigenValues, ErrorTensors
+    else:
+        return TensorArray, EigenValues
+
 def Theta1_Lower_Sweep(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Truncated,Theta0Sols,xivec,alpha,sigma,mu,inout,N0,TotalNOF,counter,PODErrorBars,alphaLB,G_Store):
 
     #Setup variables
@@ -551,8 +714,6 @@ def Theta1_Lower_Sweep(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Trunca
         return TensorArray, EigenValues, ErrorTensors
     else:
         return TensorArray, EigenValues
-
-
 
 
 #Function definition to calculate MPTs from solution vectors
