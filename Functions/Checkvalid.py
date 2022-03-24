@@ -16,10 +16,10 @@ sys.path.insert(0,"Settings")
 from Settings import SolverParameters
 
 
-def Checkvalid(Object,Order,alpha,inorout,mur,sig):
+def Checkvalid(Object,Order,alpha,inorout,mur,sig,Stepmesh):
     Object = Object[:-4]+".vol"
     #Set order Ordercheck to be of low order to speed up computation.
-    Ordercheck = 1 
+    Ordercheck = 1
     #Accuracy is increased by increaing noutput, but at greater cost
     noutput=20
 
@@ -32,7 +32,8 @@ def Checkvalid(Object,Order,alpha,inorout,mur,sig):
 
     #Creating the mesh and defining the element types
     mesh = Mesh("VolFiles/"+Object)
-    mesh.Curve(5)#This can be used to refine the mesh
+    if Stepmesh == False:
+        mesh.Curve(5)#This can be used to refine the mesh
 
     #Set materials
     mu_coef = [ mur[mat] for mat in mesh.GetMaterials() ]
@@ -114,7 +115,7 @@ def Checkvalid(Object,Order,alpha,inorout,mur,sig):
     # create numpy arrays by passing solutions back to NG Solve
     Soli=GridFunction(femfull)
     Solj=GridFunction(femfull)
-    
+
     for i in range(noutput):
         Soli.Set(exp(-((x-list[i,0])**2 + (y-list[i,1])**2 + (z-list[i,2])**2)/sval**2),definedon=mesh.Boundaries("default"))
         Soli.vec.FV().NumPy()[:]=Output[:,i]
@@ -122,13 +123,13 @@ def Checkvalid(Object,Order,alpha,inorout,mur,sig):
         for j in range(i,noutput):
             Solj.Set(exp(-((x-list[j,0])**2 + (y-list[j,1])**2 + (z-list[j,2])**2)/sval**2),definedon=mesh.Boundaries("default"))
             Solj.vec.FV().NumPy()[:]=Output[:,j]
-            
+
             Mc[i,j] = Integrate(inout * (InnerProduct(grad(Soli),grad(Solj))/alpha**2+ InnerProduct(Soli,Solj)),mesh)
             Mc[j,i] = Mc[i,j]
             M0[i,j] = Integrate((1-inout) * (InnerProduct(grad(Soli),grad(Solj))/alpha**2+ InnerProduct(Soli,Solj)),mesh)
             M0[j,i] = M0[i,j]
     print(" matrices computed       ")
-    
+
 	# solve the eigenvalue problem
     print(" solving eigenvalue problem", end='\r')
     out=slin.eig(Mc+M0,Mc,left=False, right=False)
@@ -150,5 +151,5 @@ def Checkvalid(Object,Order,alpha,inorout,mur,sig):
     cond = min(cond1,cond2)
 
     print(" maximum recomeneded frequency is ",str(round(cond/100))[:-2])
-    
+
     return cond/100

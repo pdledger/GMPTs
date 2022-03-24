@@ -13,6 +13,7 @@ Geometry = "cone_steel.geo"#"cone_d1z.geo"# "cone_alan.geo"
 #nb cone_brass.geo  used for comparing with Toykan's Brass cone
 #(string) Name of the .geo file to be used in the frequency sweep i.e.
 # "sphere.geo"
+#Geometry = "output.geo"
 
 
 #Scaling to be used in the sweep in meters
@@ -94,7 +95,7 @@ from Checkvalid import *
 
 if __name__ == '__main__':
     #Load the default settings
-    CPUs,BigProblem,PODPoints,PODTol,OldMesh = DefaultSettings()
+    CPUs,BigProblem,PODPoints,PODTol,OldMesh,Stepmesh = DefaultSettings()
 
     if OldMesh == False:
         #Create the mesh
@@ -134,44 +135,44 @@ if __name__ == '__main__':
 
     #Check the validity of the eddy-current model for the object
     if EddyCurrentTest == True:
-        EddyCurrentTest = Checkvalid(Geometry,Order,alpha,inorout,mur,sig)
+        EddyCurrentTest = Checkvalid(Geometry,Order,alpha,inorout,mur,sig,Stepmesh)
 
     if Single==True:
         if MultiProcessing!=True:
             CPUs = 1
         #MPT, EigenValues, N0, elements = SingleFrequency(Geometry,Order,alpha,inorout,mur,sig,Omega,CPUs,vtk_output,Refine)
         #print(MPT)
-        MPTR3, N0R3, elements = SingleFrequencyGMPT(Geometry,Order,alpha,inorout,mur,sig,Omega,CPUs,vtk_output,Refine)
+        MPTR3, N0R3, elements = SingleFrequencyGMPT(Geometry,Order,alpha,inorout,mur,sig,Omega,CPUs,vtk_output,Refine,Stepmesh)
     else:
         if Pod==True:
             if MultiProcessing==True:
                 if PlotPod==True:
                     if PODErrorBars==True:
-                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                     else:
-                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                 else:
                     if PODErrorBars==True:
-                        TensorArray, EigenValues, N0, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                     else:
-                        TensorArray, EigenValues, N0, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
             else:
                 if PlotPod==True:
                     if PODErrorBars==True:
-                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements, ErrorTensors = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements, ErrorTensors = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                     else:
-                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, PODTensors, PODEigenValues, elements = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                 else:
                     if PODErrorBars==True:
-                        TensorArray, EigenValues, N0, elements, ErrorTensors = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, elements, ErrorTensors = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                     else:
-                        TensorArray, EigenValues, N0, elements = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem)
+                        TensorArray, EigenValues, N0, elements = PODSweep(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
         else:
             if MultiProcessing==True:
                 #TensorArray, EigenValues, N0, elements = FullSweepMulti(Geometry,Order,alpha,inorout,mur,sig,Array,CPUs,BigProblem)
-                TensorArray, EigenValues, N0, elements = FullSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,CPUs,BigProblem)
+                TensorArray, EigenValues, N0, elements = FullSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,CPUs,BigProblem,Stepmesh)
             else:
-                TensorArray, EigenValues, N0, elements = FullSweepR3(Geometry,Order,alpha,inorout,mur,sig,Array,BigProblem)
+                TensorArray, EigenValues, N0, elements = FullSweepR3(Geometry,Order,alpha,inorout,mur,sig,Array,BigProblem,Stepmesh)
 
 
     #Plotting and saving

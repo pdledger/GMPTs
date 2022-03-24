@@ -20,7 +20,7 @@ from Settings import SolverParameters
 
 
 
-def SingleFrequency(Object,Order,alpha,inorout,mur,sig,Omega,CPUs,VTK,Refine):
+def SingleFrequency(Object,Order,alpha,inorout,mur,sig,Omega,CPUs,VTK,Refine,Stepmesh):
     Object = Object[:-4]+".vol"
     #Set up the Solver Parameters
     Solver,epsi,Maxsteps,Tolerance = SolverParameters()
@@ -31,7 +31,8 @@ def SingleFrequency(Object,Order,alpha,inorout,mur,sig,Omega,CPUs,VTK,Refine):
 
     #Creating the mesh and defining the element types
     mesh = Mesh("VolFiles/"+Object)
-    mesh.Curve(5)#This can be used to refine the mesh
+    if Stepmesh == False:
+        mesh.Curve(5)#This can be used to refine the mesh
     numelements = mesh.ne#Count the number elements
     print(" mesh contains "+str(numelements)+" elements")
 
@@ -110,13 +111,13 @@ def SingleFrequency(Object,Order,alpha,inorout,mur,sig,Omega,CPUs,VTK,Refine):
     fes2 = HCurl(mesh, order=Order, dirichlet="outer", complex=True, gradientdomains=dom_nrs_metal)
     #Count the number of degrees of freedom
     ndof2 = fes2.ndof
-    
+
     #Define the vectors for the right hand side
     xivec = [ CoefficientFunction( (0,-z,y) ), CoefficientFunction( (z,0,-x) ), CoefficientFunction( (-y,x,0) ) ]
 
     #Setup the array which will be used to store the solution vectors
     Theta1Sol = np.zeros([ndof2,3],dtype=complex)
-    
+
     #Set up the inputs for the problem
     Runlist = []
     nu = Omega*Mu0*(alpha**2)
@@ -126,17 +127,17 @@ def SingleFrequency(Object,Order,alpha,inorout,mur,sig,Omega,CPUs,VTK,Refine):
         else:
             NewInput = (fes,fes2,Theta0Sol[:,i],xivec[i],Order,alpha,nu,sigma,mu,inout,Tolerance,Maxsteps,epsi,Omega,"No Print",3,Solver)
         Runlist.append(NewInput)
-    
+
     #Run on the multiple cores
     with multiprocessing.Pool(CPUs) as pool:
         Output = pool.starmap(Theta1, Runlist)
     print(' solved theta1 problem       ')
-    
-    
+
+
     #Unpack the outputs
     for i, OutputNumber in enumerate(Output):
         Theta1Sol[:,i] = OutputNumber
-    
+
     #Create the VTK output if required
     if VTK == True:
         print(' creating vtk output', end='\r')
@@ -167,9 +168,9 @@ def SingleFrequency(Object,Order,alpha,inorout,mur,sig,Omega,CPUs,VTK,Refine):
             vtk = VTKOutput(ma=mesh, coefs=Sols, names = ["Object","E1real","E1imag","E2real","E2imag","E3real","E3imag","E1Mag","E2Mag","E3Mag"],filename=savename+Object[:-4],subdivision=0)
         vtk.Do()
         print(' vtk output created     ')
-    
 
-    
+
+
 #########################################################################
 #Calculate the tensor and eigenvalues
 
@@ -178,8 +179,8 @@ def SingleFrequency(Object,Order,alpha,inorout,mur,sig,Omega,CPUs,VTK,Refine):
     Runlist = []
     nu = Omega*Mu0*(alpha**2)
     R,I = MPTCalculator(mesh,fes,fes2,Theta1Sol[:,0],Theta1Sol[:,1],Theta1Sol[:,2],Theta0Sol,xivec,alpha,mu,sigma,inout,nu,"No Print",1)
-    print(' calculated the tensor             ') 
-    
+    print(' calculated the tensor             ')
+
     #Unpack the outputs
     MPT = N0+R+1j*I
     RealEigenvalues = np.sort(np.linalg.eigvals(N0+R))

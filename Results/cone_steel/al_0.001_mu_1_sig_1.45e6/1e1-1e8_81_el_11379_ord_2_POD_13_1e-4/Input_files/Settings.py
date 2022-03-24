@@ -26,8 +26,17 @@ def DefaultSettings():
     OldMesh = False
     #(boolean) Note that this still requires the relavent .geo file to obtain
     #information about the materials in the mesh
+    #Use an old mesh
+    # check whether if reading an old mesh if it is from a step file
+    if OldMesh == True:
+        #option to include a stepmesh and avoid curve(5) statements
+        Stepmesh = True # True if step mesh file
+    else:
+        Stepmesh = False
+    #(boolean) Note that this still requires the relavent .geo file to obtain
+    #information about the materials in the mesh
 
-    return CPUs,BigProblem,PODPoints,PODTol,OldMesh
+    return CPUs,BigProblem,PODPoints,PODTol,OldMesh,Stepmesh
 
 def AdditionalOutputs():
     #Plot the POD points

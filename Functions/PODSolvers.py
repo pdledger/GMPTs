@@ -21,7 +21,7 @@ from Settings import SolverParameters
 
 
 
-def PODSweep(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem):
+def PODSweep(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh):
     Object = Object[:-4]+".vol"
     #Set up the Solver Parameters
     Solver,epsi,Maxsteps,Tolerance = SolverParameters()
@@ -32,7 +32,8 @@ def PODSweep(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sw
 
     #Creating the mesh and defining the element types
     mesh = Mesh("VolFiles/"+Object)
-    mesh.Curve(5)#This can be used to refine the mesh
+    if Stepmesh == False:
+        mesh.Curve(5)#This can be used to refine the mesh
     numelements = mesh.ne#Count the number elements
     print(" mesh contains "+str(numelements)+" elements")
 
@@ -509,7 +510,7 @@ def PODSweep(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,sw
 
 
 
-def PODSweepMulti(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem):
+def PODSweepMulti(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh):
     Object = Object[:-4]+".vol"
     #Set up the Solver Parameters
     Solver,epsi,Maxsteps,Tolerance = SolverParameters()
@@ -520,7 +521,8 @@ def PODSweepMulti(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotP
 
     #Creating the mesh and defining the element types
     mesh = Mesh("VolFiles/"+Object)
-    mesh.Curve(5)#This can be used to refine the mesh
+    if Stepmesh == False:
+        mesh.Curve(5)#This can be used to refine the mesh
     numelements = mesh.ne#Count the number elements
     print(" mesh contains "+str(numelements)+" elements")
 
@@ -999,7 +1001,7 @@ def PODSweepMulti(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotP
             return TensorArray, EigenValues, N0, numelements
 
 
-def PODSweepMultiR3(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem):
+def PODSweepMultiR3(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh):
     Object = Object[:-4]+".vol"
     #Set up the Solver Parameters
     Solver,epsi,Maxsteps,Tolerance = SolverParameters()
@@ -1010,7 +1012,8 @@ def PODSweepMultiR3(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,Plo
 
     #Creating the mesh and defining the element types
     mesh = Mesh("VolFiles/"+Object)
-    mesh.Curve(5)#This can be used to refine the mesh
+    if Stepmesh == False:
+        mesh.Curve(5)#This can be used to refine the mesh
     numelements = mesh.ne#Count the number elements
     print(" mesh contains "+str(numelements)+" elements")
 

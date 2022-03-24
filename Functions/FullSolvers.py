@@ -22,7 +22,7 @@ from Settings import SolverParameters
 
 
 #Function definition for a full order frequency sweep
-def FullSweep(Object,Order,alpha,inorout,mur,sig,Array,BigProblem):
+def FullSweep(Object,Order,alpha,inorout,mur,sig,Array,BigProblem,Stepmesh):
     Object = Object[:-4]+".vol"
     #Set up the Solver Parameters
     Solver,epsi,Maxsteps,Tolerance = SolverParameters()
@@ -33,7 +33,8 @@ def FullSweep(Object,Order,alpha,inorout,mur,sig,Array,BigProblem):
 
     #Creating the mesh and defining the element types
     mesh = Mesh("VolFiles/"+Object)
-    mesh.Curve(5)#This can be used to refine the mesh
+    if Stepmesh == False:
+        mesh.Curve(5)#This can be used to refine the mesh
     numelements = mesh.ne#Count the number elements
     print(" mesh contains "+str(numelements)+" elements")
 
@@ -405,7 +406,7 @@ def FullSweepMultiR3(Object,Order,alpha,inorout,mur,sig,Array,CPUs,BigProblem):
 
 
 #Function definition for a full order frequency sweep
-def FullSweepR3(Object,Order,alpha,inorout,mur,sig,Array,BigProblem):
+def FullSweepR3(Object,Order,alpha,inorout,mur,sig,Array,BigProblem,Stepmesh):
     Object = Object[:-4]+".vol"
     #Set up the Solver Parameters
     Solver,epsi,Maxsteps,Tolerance = SolverParameters()
@@ -416,7 +417,8 @@ def FullSweepR3(Object,Order,alpha,inorout,mur,sig,Array,BigProblem):
 
     #Creating the mesh and defining the element types
     mesh = Mesh("VolFiles/"+Object)
-    mesh.Curve(5)#This can be used to refine the mesh
+    if Stepmesh == False:
+        mesh.Curve(5)#This can be used to refine the mesh
     numelements = mesh.ne#Count the number elements
     print(" mesh contains "+str(numelements)+" elements")
 
