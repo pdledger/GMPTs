@@ -31,7 +31,7 @@ MeshSize = 1
 #5=veryfine)
 
 #The order of the elements in the mesh
-Order = 0
+Order = 2
 #(int) this defines the order of each of the elements in the mesh
 
 
@@ -43,7 +43,7 @@ Start = 1
 Finish = 6
 #(float)
 #Number of points in the freqeuncy sweep
-Points = 10
+Points = 81
 #(int) the number of logarithmically spaced points in the sweep
 
 #I only require a single frequency
