@@ -7,7 +7,7 @@ from ngsolve import *
 #Function definition to set up default settings
 def DefaultSettings():
     #How many cores to be used (monitor memory consuption)
-    CPUs = 4
+    CPUs = 6
     #(int)
 
     #Is it a big problem (more memory efficiency but slower)
