@@ -11,18 +11,12 @@ from Plotters import *
 
 #Frequency arrays
 Frequencies = np.genfromtxt("Data/Frequencies.csv",delimiter=",")
-PODFrequencies = np.genfromtxt("Data/PODFrequencies.csv",delimiter=",")
 
 #Eigenvalue arrays
 Eigenvalues = np.genfromtxt("Data/Eigenvalues.csv",delimiter=",",dtype=complex)
-PODEigenvalues = np.genfromtxt("Data/PODEigenvalues.csv",delimiter=",",dtype=complex)
 
 #Tensor coefficient arrays
-TensorsR3 = np.genfromtxt("Data/TensorsR3.csv",delimiter=",",dtype=complex)
-PODTensorsR3 = np.genfromtxt("Data/PODTensorsR3.csv",delimiter=",",dtype=complex)
-TensorsR4 = np.genfromtxt("Data/TensorsR4.csv",delimiter=",",dtype=complex)
-PODTensorsR4 = np.genfromtxt("Data/PODTensorsR4.csv",delimiter=",",dtype=complex)
-
+Tensors = np.genfromtxt("Data/Tensors.csv",delimiter=",",dtype=complex)
 
 #Eddy-current breakdown line
 try:
@@ -37,14 +31,17 @@ except:
 
 #remove the rows so that the array represents an upper triangular matrix
 #Tensors = np.concatenate([np.concatenate([Tensors[:,:3],Tensors[:,4:6]],axis=1),Tensors[:,8:9]],axis=1)
-#PODTensors = np.concatenate([np.concatenate([PODTensors[:,:3],PODTensors[:,4:6]],axis=1),PODTensors[:,8:9]],axis=1)
+#PlottingTensorArray = np.zeros([Points,27],dtype=complex)
+#PlottingTensorArray = TensorArray #np.concatenate([np.concatenate([TensorArray[:,:3],TensorArray[:,4:6]],axis=1),TensorArray[:,8:9]],axis=1)
+
+
 
 #define the place to store it This is relative to the current file
 savename = "Graphs/"
 
 #plot the graphs
-Show = PODEigPlotter(savename,Frequencies,PODFrequencies,Eigenvalues,PODEigenvalues,omega)
-Show = PODTensorPlotter(savename,Frequencies,PODFrequencies,TensorsR3,TensorsR4,PODTensorsR3,PODTensorsR4, omega)
+Show = EigPlotter(savename,Frequencies,Eigenvalues,omega)
+Show = TensorPlotter(savename,Frequencies,Tensors,omega)
 
 #plot the graph if required
 if Show==True:
