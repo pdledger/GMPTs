@@ -8,12 +8,12 @@
 #User Inputs
 
 #Geometry
-Geometry = "cone_steel.geo"#"cone_d1z.geo"# "cone_alan.geo"
+#Geometry = "cone_steel.geo"#"cone_d1z.geo"# "cone_alan.geo"
 #nb cone_copper.geo = cone_alan.geo used for comparing with Toykan's Copper cone
 #nb cone_brass.geo  used for comparing with Toykan's Brass cone
 #(string) Name of the .geo file to be used in the frequency sweep i.e.
 # "sphere.geo"
-#Geometry = "output.geo"
+Geometry = "output.geo"
 
 
 #Scaling to be used in the sweep in meters

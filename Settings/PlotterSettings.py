@@ -21,14 +21,14 @@ def PlotterSettings():
     #             (_,_,6)
 
     #specify the indices of tensors to plot (i,j,k)
-    TensorsToPlotR3I=[2,3]
-    TensorsToPlotR3J=[2,3]
-    TensorsToPlotR3K=[3,3]
+    TensorsToPlotR3I=[1]
+    TensorsToPlotR3J=[1]
+    TensorsToPlotR3K=[1]
     #specify the indices of tensors to plot (i,j,k)
-    TensorsToPlotR4I=[1,2]
-    TensorsToPlotR4J=[1,2]
-    TensorsToPlotR4K=[1,2]
-    TensorsToPlotR4L=[1,2]
+    TensorsToPlotR4I=[1,2,1]
+    TensorsToPlotR4J=[1,2,1]
+    TensorsToPlotR4K=[1,2,2]
+    TensorsToPlotR4L=[1,2,2]
 
     #(list) Which Tensor coefficients to plot leading diagonals are [1,4,6]
     #and tensor layout can be seen below (this is used for both the main
