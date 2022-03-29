@@ -437,7 +437,7 @@ def PODTensorPlotter(savename,Array,PODArray,ValuesR3,ValuesR4,PODValuesR3,PODVa
 
     #Label the axes
     plt.xlabel("Frequency (rad/s)")
-    plt.ylabel(r"Re($\mathcal{C}_{ijk}$)")
+    plt.ylabel(r"Re($\mathcal{C}_{ijkl}$)")
 
     if Title==True:
         plt.title(r"Tensor coefficients of Re($\mathcal{C}$) rank 4")
@@ -488,7 +488,7 @@ def PODTensorPlotter(savename,Array,PODArray,ValuesR3,ValuesR4,PODValuesR3,PODVa
 
     #Label the axes
     plt.xlabel("Frequency (rad/s)")
-    plt.ylabel(r"Im($\mathcal{C}_{ijk}$)")
+    plt.ylabel(r"Im($\mathcal{C}_{ijkl}$)")
 
     if Title==True:
         plt.title(r"Tensor coefficients of Im($\mathcal{C}$) rank 4")
