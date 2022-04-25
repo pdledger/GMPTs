@@ -13,11 +13,11 @@
 #nb cone_brass.geo  used for comparing with Toykan's Brass cone
 #(string) Name of the .geo file to be used in the frequency sweep i.e.
 # "sphere.geo"
-Geometry = "sphere.geo"#"output.geo"
+Geometry = "output.geo"
 
 
 #Scaling to be used in the sweep in meters was 0.001
-alpha = 0.01
+alpha = 0.001
 #(float) scaling to be applied to the .geo file i.e. if you have defined
 #a sphere of unit radius in a .geo file   alpha = 0.01   would simulate a
 #sphere with a radius of 0.01m ( or 1cm)
@@ -31,7 +31,7 @@ MeshSize = 1
 #5=veryfine)
 
 #The order of the elements in the mesh
-Order = 0
+Order = 2
 #(int) this defines the order of each of the elements in the mesh
 
 
@@ -43,7 +43,7 @@ Start = 1
 Finish = 6
 #(float)
 #Number of points in the freqeuncy sweep
-Points = 10
+Points = 81
 #(int) the number of logarithmically spaced points in the sweep
 
 #I only require a single frequency
