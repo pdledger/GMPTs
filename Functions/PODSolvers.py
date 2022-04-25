@@ -1032,6 +1032,7 @@ def PODSweepMultiR3(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,Plo
 
     #Set up how the tensor and eigenvalues will be stored
     N0=np.zeros([3,3])
+    TensorArrayR2=np.zeros([NumberofFrequencies,9], dtype=complex)
     TensorArrayR3=np.zeros([NumberofFrequencies,27], dtype=complex)
     TensorArrayR4=np.zeros([NumberofFrequencies,81], dtype=complex)
 
@@ -1146,16 +1147,18 @@ def PODSweepMultiR3(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,Plo
     else:
         Theta1Sols = np.zeros([ndof2,NumberofSnapshots,3],dtype=complex)
     if PlotPod == True:
+        PODTensorsR2 = np.zeros([NumberofSnapshots,9],dtype=complex)
         PODTensorsR3 = np.zeros([NumberofSnapshots,27],dtype=complex)
         PODTensorsR4 = np.zeros([NumberofSnapshots,81],dtype=complex)
         PODEigenValues = np.zeros([NumberofSnapshots,3],dtype=complex)
     for i,Output in enumerate(Outputs):
         for j,Num in enumerate(Count_Distribution[i]):
             if PlotPod == True:
-                PODTensorsR3[Num,:] = Output[0][j]
-                PODTensorsR4[Num,:] = Output[1][j]
-                PODEigenValues[Num,:] = Output[2][j]
-                Theta1Sols[:,Num,:] = Output[3][:,j,:]
+                PODTensorsR2[Num,:] = Output[0][j]
+                PODTensorsR3[Num,:] = Output[1][j]
+                PODTensorsR4[Num,:] = Output[2][j]
+                PODEigenValues[Num,:] = Output[3][j]
+                Theta1Sols[:,Num,:] = Output[4][:,j,:]
             else:
                 Theta1Sols[:,Num,:] = Output[:,j,:]
 
@@ -1475,24 +1478,26 @@ def PODSweepMultiR3(Object,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,Plo
     for i,Output in enumerate(Outputs):
         for j,Num in enumerate(Count_Distribution[i]):
             if PODErrorBars == True:
-                TensorArrayR3[Num,:] = Output[0][j]
-                TensorArrayR4[Num,:] = Output[1][j]
-                EigenValues[Num,:] = Output[2][j]
-                ErrorTensors[Num,:] = Output[3][j]
+                TensorArrayR2[Num,:] = Output[0][j]
+                TensorArrayR3[Num,:] = Output[1][j]
+                TensorArrayR4[Num,:] = Output[2][j]
+                EigenValues[Num,:] = Output[3][j]
+                ErrorTensors[Num,:] = Output[4][j]
             else:
-                TensorArrayR3[Num,:] = Output[0][j]
-                TensorArrayR4[Num,:] = Output[1][j]
-                EigenValues[Num,:] = Output[2][j]
+                TensorArrayR2[Num,:] = Output[0][j]
+                TensorArrayR3[Num,:] = Output[1][j]
+                TensorArrayR4[Num,:] = Output[2][j]
+                EigenValues[Num,:] = Output[3][j]
 
     print(' reduced order systems solved          ')
     print(' frequency sweep complete')
     if PlotPod==True:
         if PODErrorBars==True:
-            return TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR3, PODTensorsR4, PODEigenValues, numelements, ErrorTensors
+            return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR2, PODTensorsR3, PODTensorsR4, PODEigenValues, numelements, ErrorTensors
         else:
-            return TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR3, PODTensorsR4, PODEigenValues, numelements
+            return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR2, PODTensorsR3, PODTensorsR4, PODEigenValues, numelements
     else:
         if PODErrorBars==True:
-            return TensorArrayR3, TensorArrayR4, EigenValues, N0, numelements, ErrorTensors
+            return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, numelements, ErrorTensors
         else:
-            return TensorArrayR3, TensorArrayR4, EigenValues, N0, numelements
+            return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, numelements

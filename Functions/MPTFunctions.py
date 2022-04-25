@@ -275,6 +275,7 @@ def Theta1_SweepR3(Array,mesh,fes,fes2,Theta0Sols,xivec,alpha,sigma,mu,inout,Tol
     if Tensors == True:
         R=np.zeros([3,3])
         I=np.zeros([3,3])
+        TensorArrayR2=np.zeros([NOF,9], dtype=complex)
         TensorArrayR3=np.zeros([NOF,27], dtype=complex)
         TensorArrayR4=np.zeros([NOF,81], dtype=complex)
         EigenValues = np.zeros([NOF,3], dtype=complex)
@@ -395,8 +396,31 @@ def Theta1_SweepR3(Array,mesh,fes,fes2,Theta0Sols,xivec,alpha,sigma,mu,inout,Tol
             CR3=np.zeros([3,3,3], dtype=complex)
             CR4=np.zeros([3,3,3,3], dtype=complex)
 
+            for i in range(3):
+                Theta0i.vec.FV().NumPy()[:] = Theta0Sols[:,i]
+                xii = xivec[i]
+                if i==0:
+                    Theta1i.vec.data=Theta1.vec.data
+                if i==1:
+                    Theta1i.vec.data=Theta2.vec.data
+                if i==2:
+                    Theta1i.vec.data=Theta3.vec.data
+                for j in range(i+1):
+                    Theta0j.vec.FV().NumPy()[:] = Theta0Sols[:,j]
+                    xij = xivec[j]
+                    if j==0:
+                        Theta1j.vec.data=Theta1.vec.data
+                    if j==1:
+                        Theta1j.vec.data=Theta2.vec.data
+                    if j==2:
+                        Theta1j.vec.data=Theta3.vec.data
+
+                    #Real and Imaginary parts
+                    R[i,j]=-(((alpha**3)/4)*Integrate((mu**(-1))*(curl(Theta1j)*Conj(curl(Theta1i))),mesh)).real
+                    I[i,j]=((alpha**3)/4)*Integrate(inout*nu_no_omega*Omega*sigma*((Theta1j+Theta0j+xij)*(Conj(Theta1i)+Theta0i+xii)),mesh).real
+
             vol=alpha**3*Integrate(inout,mesh)
-            print(vol)
+            #print(vol)
             for i in range(3):
                 for j in range(3):
                     for kk in range(3):
@@ -441,18 +465,26 @@ def Theta1_SweepR3(Array,mesh,fes,fes2,Theta0Sols,xivec,alpha,sigma,mu,inout,Tol
 
 
             #Save in arrays
-            print(CR3)
+            #print(CR3)
             TensorArrayR3[k,:] = (CR3).flatten()
             TensorArrayR4[k,:] = (CR4).flatten()
+
+            #Mirror tensor
+            R+=np.transpose(R-np.diag(np.diag(R)))
+            I+=np.transpose(I-np.diag(np.diag(I)))
+
+            #Save in arrays
+            TensorArrayR2[k,:] = (N0+R+1j*I).flatten()
+            EigenValues[k,:] = np.sort(np.linalg.eigvals(N0+R))+1j*np.sort(np.linalg.eigvals(I))
 
 
 
             #EigenValues[k,:] = np.sort(np.linalg.eigvals(N0+R))+1j*np.sort(np.linalg.eigvals(I))
 
     if Tensors == True and Vectors == True:
-        return TensorArrayR3, TensorArrayR4, EigenValues, Theta1Sols
+        return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, Theta1Sols
     elif Tensors == True:
-        return TensorArrayR3, TensorArrayR4, EigenValues
+        return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues
     else:
         return Theta1Sols
 
@@ -474,6 +506,7 @@ def Theta1_Lower_SweepR3(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Trun
     Theta_1j=GridFunction(fes2)
     Theta_1k=GridFunction(fes2)
 
+    TensorArrayR2 = np.zeros([NOF,9],dtype=complex)
     TensorArrayR3 = np.zeros([NOF,27],dtype=complex)
     TensorArrayR4 = np.zeros([NOF,81], dtype=complex)
     EigenValues = np.zeros([NOF,3],dtype=complex)
@@ -507,38 +540,38 @@ def Theta1_Lower_SweepR3(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Trun
         R=np.zeros([3,3])
         I=np.zeros([3,3])
 
-#        for i in range(3):
-#            Theta_0i.vec.FV().NumPy()[:] = Theta0Sols[:,i]
-#            xii = xivec[i]
-#            if i==0:
-#                Theta_1i.vec.FV().NumPy()[:]=W1
-#            if i==1:
-#                Theta_1i.vec.FV().NumPy()[:]=W2
-#            if i==2:
-#                Theta_1i.vec.FV().NumPy()[:]=W3
-#            for j in range(i+1):
-#                Theta_0j.vec.FV().NumPy()[:]=Theta0Sols[:,j]
-#                xij=xivec[j]
-#                if j==0:
-#                    Theta_1j.vec.FV().NumPy()[:]=W1
-#                if j==1:
-#                    Theta_1j.vec.FV().NumPy()[:]=W2
-#                if j==2:
-#                    Theta_1j.vec.FV().NumPy()[:]=W3
+        for i in range(3):
+            Theta_0i.vec.FV().NumPy()[:] = Theta0Sols[:,i]
+            xii = xivec[i]
+            if i==0:
+                Theta_1i.vec.FV().NumPy()[:]=W1
+            if i==1:
+                Theta_1i.vec.FV().NumPy()[:]=W2
+            if i==2:
+                Theta_1i.vec.FV().NumPy()[:]=W3
+            for j in range(i+1):
+                Theta_0j.vec.FV().NumPy()[:]=Theta0Sols[:,j]
+                xij=xivec[j]
+                if j==0:
+                    Theta_1j.vec.FV().NumPy()[:]=W1
+                if j==1:
+                    Theta_1j.vec.FV().NumPy()[:]=W2
+                if j==2:
+                    Theta_1j.vec.FV().NumPy()[:]=W3
 
                 #Real and Imaginary parts
-#                R[i,j]=-(((alpha**3)/4)*Integrate((mu**(-1))*(curl(Theta_1j)*Conj(curl(Theta_1i))),mesh)).real
-#                I[i,j]=((alpha**3)/4)*Integrate(inout*nu*sigma*((Theta_1j+Theta_0j+xij)*(Conj(Theta_1i)+Theta_0i+xii)),mesh).real
+                R[i,j]=-(((alpha**3)/4)*Integrate((mu**(-1))*(curl(Theta_1j)*Conj(curl(Theta_1i))),mesh)).real
+                I[i,j]=((alpha**3)/4)*Integrate(inout*nu*sigma*((Theta_1j+Theta_0j+xij)*(Conj(Theta_1i)+Theta_0i+xii)),mesh).real
 
-#        R+=np.transpose(R-np.diag(np.diag(R))).real
-#        I+=np.transpose(I-np.diag(np.diag(I))).real
+        R+=np.transpose(R-np.diag(np.diag(R))).real
+        I+=np.transpose(I-np.diag(np.diag(I))).real
 
         NR3=np.zeros([3,3,3], dtype=complex)
         CR3=np.zeros([3,3,3], dtype=complex)
         CR4=np.zeros([3,3,3,3], dtype=complex)
 
         vol=alpha**3*Integrate(inout,mesh)
-        print(vol)
+        #print(vol)
         for i in range(3):
             for j in range(3):
                 for kk in range(3):
@@ -592,6 +625,8 @@ def Theta1_Lower_SweepR3(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Trun
 
         #Save in arrays
 #            print(CR3)
+        #Save in arrays
+        TensorArrayR2[k,:] = (N0+R+1j*I).flatten()
         TensorArrayR3[k,:] = (CR3).flatten()
         TensorArrayR4[k,:] = (CR4).flatten()
 
@@ -646,9 +681,9 @@ def Theta1_Lower_SweepR3(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Trun
 
 
     if PODErrorBars == True:
-        return TensorArrayR3, TensorArrayR4, EigenValues, ErrorTensors
+        return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, ErrorTensors
     else:
-        return TensorArrayR3, TensorArrayR4, EigenValues
+        return TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues
 
 def Theta1_Lower_Sweep(Array,mesh,fes,fes2,Sols,u1Truncated,u2Truncated,u3Truncated,Theta0Sols,xivec,alpha,sigma,mu,inout,N0,TotalNOF,counter,PODErrorBars,alphaLB,G_Store):
 

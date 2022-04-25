@@ -102,7 +102,7 @@ def SingleSave(Geometry, Omega, MPT, EigenValues, N0, elements, alpha, Order, Me
 
 
 
-def PODSave(Geometry, Array, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR3, PODTensorsR4, PODEigenValues, PODArray, PODTol, elements, alpha, Order, MeshSize, mur, sig, ErrorTensors, EddyCurrentTest):
+def PODSave(Geometry, Array, TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR2, PODTensorsR3, PODTensorsR4, PODEigenValues, PODArray, PODTol, elements, alpha, Order, MeshSize, mur, sig, ErrorTensors, EddyCurrentTest):
 
     #Find how the user wants the data to be saved
     FolderStructure = SaverSettings()
@@ -134,6 +134,7 @@ def PODSave(Geometry, Array, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODT
     np.savetxt("Results/"+sweepname+"/Data/Eigenvalues.csv",EigenValues, delimiter=",")
     np.savetxt("Results/"+sweepname+"/Data/PODEigenvalues.csv",PODEigenValues, delimiter=",")
     np.savetxt("Results/"+sweepname+"/Data/N0.csv",N0, delimiter=",")
+    np.savetxt("Results/"+sweepname+"/Data/TensorsR2.csv",TensorArrayR2, delimiter=",")
     np.savetxt("Results/"+sweepname+"/Data/TensorsR3.csv",TensorArrayR3, delimiter=",")
     np.savetxt("Results/"+sweepname+"/Data/TensorsR4.csv",TensorArrayR4, delimiter=",")
     np.savetxt("Results/"+sweepname+"/Data/PODTensorsR3.csv",PODTensorsR3, delimiter=",")
@@ -145,10 +146,10 @@ def PODSave(Geometry, Array, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODT
 
 
     #Format the tensor arrays so they can be plotted
-#    PlottingTensorArray = np.zeros([Points,6],dtype=complex)
-#    PlottingPODTensors = np.zeros([PODPoints,6],dtype=complex)
-#    PlottingTensorArray = np.concatenate([np.concatenate([TensorArray[:,:3],TensorArray[:,4:6]],axis=1),TensorArray[:,8:9]],axis=1)
-#    PlottingPODTensors = np.concatenate([np.concatenate([PODTensors[:,:3],PODTensors[:,4:6]],axis=1),PODTensors[:,8:9]],axis=1)
+    PlottingTensorArrayR2 = np.zeros([Points,6],dtype=complex)
+    PlottingPODTensorsR2 = np.zeros([PODPoints,6],dtype=complex)
+    PlottingTensorArrayR2 = np.concatenate([np.concatenate([TensorArrayR2[:,:3],TensorArrayR2[:,4:6]],axis=1),TensorArrayR2[:,8:9]],axis=1)
+    PlottingPODTensorsR2 = np.concatenate([np.concatenate([PODTensorsR2[:,:3],PODTensorsR2[:,4:6]],axis=1),PODTensorsR2[:,8:9]],axis=1)
 
     PlottingTensorArrayR3 = np.zeros([Points,27],dtype=complex)
     PlottingPODTensorsR3 = np.zeros([PODPoints,27],dtype=complex)
@@ -178,10 +179,11 @@ def PODSave(Geometry, Array, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODT
 
     try:
         if ErrorTensors==False:
+            Show = PODTensorPlotterR2(savename,Array,PODArray,PlottingTensorArrayR2,PlottingPODTensorsR2,EddyCurrentTest)
             Show = PODTensorPlotter(savename,Array,PODArray,PlottingTensorArrayR3,PlottingTensorArrayR4, PlottingPODTensorsR3, PlottingPODTensorsR4, EddyCurrentTest)
     except:
         #needs updating
-        Show = PODErrorPlotter(savename,Array,PODArray,PlottingTensorArrayR3,PlottingPODTensorsR3,ErrorTensors,EddyCurrentTest)
+        Show = PODErrorPlotter(savename,Array,PODArray,PlottingTensorArrayR2,PlottingPODTensorsR2,ErrorTensors,EddyCurrentTest)
 
         #Change the format of the error bars to the format of the Tensors
         Errors = np.zeros([Points,9])

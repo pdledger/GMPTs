@@ -13,11 +13,11 @@
 #nb cone_brass.geo  used for comparing with Toykan's Brass cone
 #(string) Name of the .geo file to be used in the frequency sweep i.e.
 # "sphere.geo"
-Geometry = "output.geo"
+Geometry = "sphere.geo"#"output.geo"
 
 
-#Scaling to be used in the sweep in meters
-alpha = 0.001
+#Scaling to be used in the sweep in meters was 0.001
+alpha = 0.01
 #(float) scaling to be applied to the .geo file i.e. if you have defined
 #a sphere of unit radius in a .geo file   alpha = 0.01   would simulate a
 #sphere with a radius of 0.01m ( or 1cm)
@@ -31,7 +31,7 @@ MeshSize = 1
 #5=veryfine)
 
 #The order of the elements in the mesh
-Order = 2
+Order = 0
 #(int) this defines the order of each of the elements in the mesh
 
 
@@ -43,7 +43,7 @@ Start = 1
 Finish = 6
 #(float)
 #Number of points in the freqeuncy sweep
-Points = 81
+Points = 10
 #(int) the number of logarithmically spaced points in the sweep
 
 #I only require a single frequency
@@ -148,14 +148,14 @@ if __name__ == '__main__':
             if MultiProcessing==True:
                 if PlotPod==True:
                     if PODErrorBars==True:
-                        TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR3, PODTensorsR4, PODEigenValues, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
+                        TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR2, PODTensorsR3, PODTensorsR4, PODEigenValues, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                     else:
-                        TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR3, PODTensorsR4, PODEigenValues, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
+                        TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR2, PODTensorsR3, PODTensorsR4, PODEigenValues, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                 else:
                     if PODErrorBars==True:
-                        TensorArrayR3, TensorArrayR4, EigenValues, N0, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
+                        TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, elements, ErrorTensors = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
                     else:
-                        TensorArrayR3, TensorArrayR4, EigenValues, N0, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
+                        TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, elements = PODSweepMultiR3(Geometry,Order,alpha,inorout,mur,sig,Array,PODArray,PODTol,PlotPod,CPUs,sweepname,SavePOD,PODErrorBars,BigProblem,Stepmesh)
             else:
                 if PlotPod==True:
                     if PODErrorBars==True:
@@ -180,7 +180,7 @@ if __name__ == '__main__':
         SingleSave(Geometry, Omega, MPT, EigenValues, N0, elements, alpha, Order, MeshSize, mur, sig, EddyCurrentTest)
     elif PlotPod==True:
         if Pod==True:
-            PODSave(Geometry, Array, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR3, PODTensorsR4, PODEigenValues, PODArray, PODTol, elements, alpha, Order, MeshSize, mur, sig, ErrorTensors,EddyCurrentTest)
+            PODSave(Geometry, Array, TensorArrayR2, TensorArrayR3, TensorArrayR4, EigenValues, N0, PODTensorsR2, PODTensorsR3, PODTensorsR4, PODEigenValues, PODArray, PODTol, elements, alpha, Order, MeshSize, mur, sig, ErrorTensors,EddyCurrentTest)
         else:
             FullSave(Geometry, Array, TensorArray, EigenValues, N0, Pod, PODArray, PODTol, elements, alpha, Order, MeshSize, mur, sig, ErrorTensors,EddyCurrentTest)
     else:
